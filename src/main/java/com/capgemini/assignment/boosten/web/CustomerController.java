@@ -37,7 +37,7 @@ public class CustomerController {
 	  @GetMapping("/customers")
 	  CollectionModel<EntityModel<Customer>> all() {
 
-	    List<EntityModel<Customer>> customers = dao.findAll().stream() //
+	    List<EntityModel<Customer>> customers = dao.findAllWithAccounts().stream() //
 	        .map(customerAssembler::toModel) //
 	        .collect(Collectors.toList());
 

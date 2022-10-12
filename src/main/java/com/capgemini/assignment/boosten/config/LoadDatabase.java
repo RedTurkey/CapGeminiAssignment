@@ -6,22 +6,26 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
 import com.capgemini.assignment.boosten.model.Customer;
 
 @Configuration
 public class LoadDatabase {
 
-	  private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
+	private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
 
-	  @Bean
-	  CommandLineRunner initDatabase(ICustomerDAO customerDAO) {
+	@Bean
+	CommandLineRunner initDatabase(ICustomerDAO customerDAO, IAccountDAO accountDAO) {
 
-	    return args -> {
-	    	customerDAO.save(new Customer("Boosten", "Vincent"));
-	      customerDAO.save(new Customer("Boosten", "Jonathan"));
+		return args -> {
+			Customer c1 = new Customer("Boosten", "Vincent");
+			c1.createAccount();
+			
+			customerDAO.save(c1);
+			customerDAO.save(new Customer("Boosten", "Jonathan"));
 
-	      customerDAO.findAll().forEach(customer -> log.info("Preloaded " + customer));
-	    };
-	  }
+			customerDAO.findAllWithAccounts().forEach(customer -> log.info("Preloaded " + customer));
+		};
+	}
 }
