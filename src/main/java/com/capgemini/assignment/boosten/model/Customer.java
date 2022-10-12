@@ -36,4 +36,14 @@ public class Customer {
 		this.name = name;
 		this.surname = surname;
 	}
+	
+	public double getBalance() {
+		double balance = 0.0;
+		
+		for (Account account : accounts) {
+			balance = balance + account.getBalance();
+		}
+		
+		return balance;
+	}
 }

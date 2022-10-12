@@ -25,18 +25,26 @@ public class Transaction {
 	private Timestamp date;
 	
 	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKCreator")
 	private Account creator;
 
 	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKSender")
 	private Account sender;
 
 	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKReceiver")
 	private Account receiver;
 
+	public Transaction(double amount, String communication,
+			Account creator, Account sender, Account receiver) {
+		this.amount = amount;
+		this.communication = communication;
+		this.creator = creator;
+		this.sender = sender;
+		this.receiver = receiver;
+	}
 }

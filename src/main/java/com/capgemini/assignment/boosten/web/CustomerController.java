@@ -18,78 +18,95 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
+import com.capgemini.assignment.boosten.data.ITransactionDAO;
 import com.capgemini.assignment.boosten.exception.CustomerNotFoundException;
+import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
 
 @RestController
 public class CustomerController {
-	  private final ICustomerDAO dao;
+	private final ICustomerDAO customerDao;
+	private final ITransactionDAO transactionDao;
+	private final IAccountDAO accountDao;
 
-	  private final CustomerModelAssembler customerAssembler;
+	private final CustomerModelAssembler customerAssembler;
+	private final TransactionModelAssembler transactionAssembler;
+	private final AccountModelAssembler accountAssembler;
 
-	  CustomerController(ICustomerDAO dao, CustomerModelAssembler customerAssembler) {
+	CustomerController(ICustomerDAO customerDao, CustomerModelAssembler customerAssembler,
+			ITransactionDAO transactionDao, TransactionModelAssembler transactionAssembler,
+			IAccountDAO accountDao, AccountModelAssembler accountAssembler) {
 
-	    this.dao = dao;
-	    this.customerAssembler = customerAssembler;
-	  }
+		this.customerDao = customerDao;
+		this.customerAssembler = customerAssembler;
+		this.transactionDao = transactionDao;
+		this.transactionAssembler = transactionAssembler;
+		this.accountDao = accountDao;
+		this.accountAssembler = accountAssembler;
+	}
 
-	  @GetMapping("/customers")
-	  CollectionModel<EntityModel<Customer>> all() {
+	@GetMapping("/customers")
+	CollectionModel<EntityModel<Customer>> all() {
 
-	    List<EntityModel<Customer>> customers = dao.findAllWithAccounts().stream() //
-	        .map(customerAssembler::toModel) //
-	        .collect(Collectors.toList());
+		List<EntityModel<Customer>> customers = customerDao.findAll().stream() //
+				.map(customerAssembler::toModel) //
+				.collect(Collectors.toList());
 
-	    return CollectionModel.of(customers, linkTo(methodOn(CustomerController.class).all()).withSelfRel());
-	  }
+		return CollectionModel.of(customers, linkTo(methodOn(CustomerController.class).all()).withSelfRel());
+	}
 
-	  @PostMapping("/customers")
-	  ResponseEntity<?> newCustomer(@RequestBody Customer newCustomer) {
+	@PostMapping("/customers")
+	ResponseEntity<?> newCustomer(@RequestBody Customer newCustomer) {
 
-	    EntityModel<Customer> entityModel = customerAssembler.toModel(dao.save(newCustomer));
+		EntityModel<Customer> entityModel = customerAssembler.toModel(customerDao.save(newCustomer));
 
-	    return ResponseEntity //
-	        .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-	        .body(entityModel);
-	  }
-	  
-	  @GetMapping("/customers/{id}")
-	  EntityModel<Customer> one(@PathVariable Long id) {
+		return ResponseEntity //
+				.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+				.body(entityModel);
+	}
 
-		  Customer customer = dao.findById(id) //
-	        .orElseThrow(() -> new CustomerNotFoundException(id));
+	@GetMapping("/customers/{customerId}")
+	EntityModel<Customer> one(@PathVariable Long customerId) {
 
-	    return customerAssembler.toModel(customer);
-	  }
+		Customer customer = customerDao.findById(customerId) //
+				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-	  @PutMapping("/customers/{id}")
-	  ResponseEntity<?> replaceCustomer(@RequestBody Customer newCustomer, @PathVariable Long id) {
+		return customerAssembler.toModel(customer);
+	}
 
-		  Customer updatedCustomer = dao.findById(id) //
-	        .map(customer -> {
-	        	customer.setName(newCustomer.getName());
-	          customer.setSurname(newCustomer.getSurname());
-	          customer.setAccounts(newCustomer.getAccounts());
-	          return dao.save(customer);
-	        }) //
-	        .orElseGet(() -> {
-	        	newCustomer.setId(id);
-	          return dao.save(newCustomer);
-	        });
+	@PutMapping("/customers/{customerId}")
+	ResponseEntity<?> replaceCustomer(@RequestBody Customer newCustomer, @PathVariable Long customerId) {
 
-	    EntityModel<Customer> entityModel = customerAssembler.toModel(updatedCustomer);
+		Customer updatedCustomer = customerDao.findById(customerId) //
+				.map(customer -> {
+					customer.setName(newCustomer.getName());
+					customer.setSurname(newCustomer.getSurname());
+					customer.setAccounts(newCustomer.getAccounts());
+					return customerDao.save(customer);
+				}) //
+				.orElseGet(() -> {
+					newCustomer.setId(customerId);
+					return customerDao.save(newCustomer);
+				});
 
-	    return ResponseEntity //
-	        .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-	        .body(entityModel);
-	  }
+		EntityModel<Customer> entityModel = customerAssembler.toModel(updatedCustomer);
 
-	  @DeleteMapping("/customers/{id}")
-	  ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+		return ResponseEntity //
+				.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+				.body(entityModel);
+	}
 
-	    dao.deleteById(id);
+	@GetMapping("/customers/{customerId}/accounts")
+	CollectionModel<EntityModel<Account>> customerAccounts(@PathVariable Long customerId) {
+		Customer customer = customerDao.findByIdWithAccounts(customerId) //
+				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-	    return ResponseEntity.noContent().build();
-	  }
+		List<EntityModel<Account>> accounts = customer.getAccounts().stream() //
+				.map(accountAssembler::toModel) //
+				.collect(Collectors.toList());
+
+		return CollectionModel.of(accounts, linkTo(methodOn(CustomerController.class).all()).withSelfRel());
+	}
 }
