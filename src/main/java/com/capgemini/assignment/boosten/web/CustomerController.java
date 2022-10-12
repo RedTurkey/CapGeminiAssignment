@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
 import com.capgemini.assignment.boosten.data.ITransactionDAO;
+import com.capgemini.assignment.boosten.exception.AccountNotFoundException;
 import com.capgemini.assignment.boosten.exception.CustomerNotFoundException;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
@@ -83,13 +84,9 @@ public class CustomerController {
 				.map(customer -> {
 					customer.setName(newCustomer.getName());
 					customer.setSurname(newCustomer.getSurname());
-					customer.setAccounts(newCustomer.getAccounts());
 					return customerDao.save(customer);
 				}) //
-				.orElseGet(() -> {
-					newCustomer.setId(customerId);
-					return customerDao.save(newCustomer);
-				});
+				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
 		EntityModel<Customer> entityModel = customerAssembler.toModel(updatedCustomer);
 
@@ -104,9 +101,12 @@ public class CustomerController {
 				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
 		List<EntityModel<Account>> accounts = customer.getAccounts().stream() //
-				.map(accountAssembler::toModel) //
+				.map(accountId -> {
+					Account account = accountDao.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
+					return accountAssembler.toModel(account);
+				}) //
 				.collect(Collectors.toList());
-
-		return CollectionModel.of(accounts, linkTo(methodOn(CustomerController.class).all()).withSelfRel());
+		
+		return CollectionModel.of(accounts, linkTo(methodOn(AccountController.class).all()).withSelfRel());
 	}
 }

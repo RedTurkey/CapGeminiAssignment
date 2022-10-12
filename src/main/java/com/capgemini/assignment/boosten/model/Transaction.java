@@ -9,32 +9,33 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Data
+@ToString
+@EqualsAndHashCode
 @NoArgsConstructor
 public class Transaction {
+	@Getter
 	private @Id @GeneratedValue Long id;
+	@Getter
 	private double amount;
+	@Getter
 	private String communication;
+	@Getter
 	private Timestamp date;
 	
-	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKCreator")
 	private Account creator;
 
-	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKSender")
 	private Account sender;
 
-	@JsonIdentityInfo( generator = ObjectIdGenerators.PropertyGenerator.class, property = "id" )
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKReceiver")
 	private Account receiver;
@@ -46,5 +47,17 @@ public class Transaction {
 		this.creator = creator;
 		this.sender = sender;
 		this.receiver = receiver;
+	}
+	
+	public Long getCreatorId() {
+		return creator.getId();
+	}
+	
+	public Long getSenderId() {
+		return creator.getId();
+	}
+	
+	public Long getReceiverId() {
+		return creator.getId();
 	}
 }

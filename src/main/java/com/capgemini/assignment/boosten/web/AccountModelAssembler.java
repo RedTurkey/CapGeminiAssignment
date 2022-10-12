@@ -16,7 +16,6 @@ public class AccountModelAssembler implements RepresentationModelAssembler<Accou
   public EntityModel<Account> toModel(Account account) {
     return EntityModel.of(account, //
         linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel(),
-        linkTo(methodOn(AccountController.class).all()).withRel("accounts"),
-        linkTo(methodOn(CustomerController.class).customerAccounts(account.getCustomer().getId())).withRel("customerAccounts"));
+        linkTo(methodOn(AccountController.class).all()).withRel("accounts"));
   }
 }
