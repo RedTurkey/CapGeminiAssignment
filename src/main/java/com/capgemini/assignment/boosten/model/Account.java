@@ -20,6 +20,9 @@ public class Account {
 	@Getter
 	@Setter
 	private double balance;
+	@Getter
+	@Setter
+	private AccountStatus status;
 	
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "FKCustomer")

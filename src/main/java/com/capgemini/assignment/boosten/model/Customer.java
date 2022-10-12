@@ -29,6 +29,9 @@ public class Customer {
 	@Getter
 	@Setter
 	private String surname;
+	@Getter
+	@Setter
+	private CustomerStatus status;
 	
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Account> accounts = new ArrayList<>();
