@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -17,7 +18,7 @@ public class Customer {
 	private String name;
 	private String surname;
 	
-	@OneToMany(mappedBy = "customer")
+	@OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
 	private Collection<Account> accounts = new ArrayList<>();
 
 	public Customer() {
