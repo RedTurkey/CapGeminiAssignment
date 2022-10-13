@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
+import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
 
 @Configuration
@@ -20,10 +21,12 @@ public class LoadDatabase {
 
 		return args -> {
 			Customer c1 = new Customer("Boosten", "Vincent");
-			c1.createAccount();
-			
+			Account a1 = new Account(c1);
+
 			customerDAO.save(c1);
 			customerDAO.save(new Customer("Boosten", "Jonathan"));
+
+			accountDAO.save(a1);
 
 			customerDAO.findAllWithAccounts().forEach(customer -> log.info("Preloaded " + customer));
 		};

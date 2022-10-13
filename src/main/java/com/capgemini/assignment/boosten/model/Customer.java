@@ -36,11 +36,6 @@ public class Customer {
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Account> accounts = new ArrayList<>();
 	
-	public void createAccount() {
-		Account account = new Account(this);
-		this.addAccount(account);
-	}
-	
 	public Collection<Long> getAccounts() {
 		Collection<Long> accountsId = new ArrayList<>();
 		
@@ -68,5 +63,6 @@ public class Customer {
 	public Customer(String name, String surname) {
 		this.name = name;
 		this.surname = surname;
+		this.status = CustomerStatus.ACTIVE;
 	}
 }

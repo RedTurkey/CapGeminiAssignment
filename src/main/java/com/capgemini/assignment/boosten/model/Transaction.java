@@ -2,6 +2,7 @@ package com.capgemini.assignment.boosten.model;
 
 import java.sql.Timestamp;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -28,15 +29,15 @@ public class Transaction {
 	@Getter
 	private Timestamp date;
 	
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "FKCreator")
 	private Account creator;
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "FKSender")
 	private Account sender;
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
 	@JoinColumn(name = "FKReceiver")
 	private Account receiver;
 
@@ -47,6 +48,7 @@ public class Transaction {
 		this.creator = creator;
 		this.sender = sender;
 		this.receiver = receiver;
+		this.date = new Timestamp(System.currentTimeMillis());
 	}
 	
 	public Long getCreatorId() {
