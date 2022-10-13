@@ -7,7 +7,7 @@ Once you have cloned the project, provided that you have gradle installed on you
 gradle clean build
 ```
 Once that is done, make sure you have tomcat version 10 installed on your computer.  
-Since we are using tomcat 10, you have to locate your tomcat installation (under windows, its C:\Program Files\Apache Software Foundation\Tomcat 10.0) and create a folder webapps-javaee if it does not exist.  
+Since we are using tomcat 10, you have to locate your tomcat installation (under windows, it's C:\Program Files\Apache Software Foundation\Tomcat 10.0) and create a folder webapps-javaee if it does not exist.  
 You can then put the generated war file in that folder and restart tomcat, which will then migrate the war file from Java EE into Jakarta EE.
   
 The application should now be deployed and accessible on (or another port if you put your tomcat on something else than 8080) localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT  
@@ -29,4 +29,8 @@ Note that the application is a Rest Spring API, and as such, does not have a fro
 /customers/{customerId}/accounts/{initialCredit}
 // To recover a single customer's details (name + surname + balance + transactions) (GET)
 /customers/{customerId}/details
+```
+For example, on my computer, the command to create a new account for a customer with an initial credit of 10 is as follow :  
+```
+curl -X POST localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT/customers/1/accounts/10 -H 'Content-type:application/json' -d '{}' | json_pp
 ```
