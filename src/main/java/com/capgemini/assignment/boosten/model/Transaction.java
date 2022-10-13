@@ -14,6 +14,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * The entity for transaction, which has no setter as the value for a transaction should obviously not change after its creation
+ */
 @Entity
 @ToString
 @EqualsAndHashCode
@@ -27,6 +30,10 @@ public class Transaction {
 	private String communication;
 	@Getter
 	private Timestamp date;
+	
+	/**
+	 * We fetch the following relations eagerly as there is no list in there
+	 */
 	
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKCreator")

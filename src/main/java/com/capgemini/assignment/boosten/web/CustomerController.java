@@ -30,6 +30,11 @@ import com.capgemini.assignment.boosten.model.Customer;
 import com.capgemini.assignment.boosten.model.CustomerDetails;
 import com.capgemini.assignment.boosten.model.Transaction;
 
+/**
+ * The main and only controller since most data relate around the customer, albeit there was supposed to be an account
+ * controller and a transaction controller, purely to have their individual data easily accessible without having to send
+ * the customer id every time
+ */
 @RestController
 public class CustomerController {
 	private final ICustomerDAO customerDao;

@@ -33,6 +33,9 @@ public class Customer {
 	@Setter
 	private CustomerStatus status;
 	
+	/**
+	 * As it should be, we keep the list of accounts for a customer, although in the database this column does not exist
+	 */
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Account> accounts = new ArrayList<>();
 	
@@ -46,6 +49,9 @@ public class Customer {
 		return accountsId;
 	}
 	
+	/**
+	 * Used to recover the current total balance of a customer, which is the aggregate of its accounts balance
+	 */
 	public double getBalance() {
 		double balance = 0.0;
 		

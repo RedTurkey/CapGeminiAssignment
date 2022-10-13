@@ -34,6 +34,10 @@ public class Account {
 	@JoinColumn(name = "FKCustomer")
 	private Customer customer;
 
+	/**
+	 * The following collections are used to keep track of the different types of transactions for the account
+	 */
+	
 	@OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Transaction> createdTransactions = new ArrayList<>();
 
@@ -67,6 +71,9 @@ public class Account {
 		return customer.getId();
 	}
 	
+	/**
+	 * To prevent reference looping, a custom toString method is used, albeit it became obsolete when getting rid of the unnecessary getter for the customer
+	 */
 	@Override
 	public String toString() {
 		return "Account(id=" + id + ", balance=" + balance + ", customerId=" + customer.getId() + ")";

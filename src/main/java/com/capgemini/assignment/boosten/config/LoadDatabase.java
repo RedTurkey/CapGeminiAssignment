@@ -18,6 +18,9 @@ public class LoadDatabase {
 
 	private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
 
+	/**
+	 * Basic data loading bean to have a set of basic data for this project
+	 */
 	@Bean
 	CommandLineRunner initDatabase(ICustomerDAO customerDAO, IAccountDAO accountDAO, ITransactionDAO transactionDao) {
 
