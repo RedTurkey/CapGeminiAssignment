@@ -15,18 +15,32 @@ Note that the application is a Rest Spring API, and as such, does not have a fro
 ```
 // To recover all customers (GET)
 /customers
+```
+```
 // To recover a single customer (GET)
 /customers/{customerId}
+```
+```
 // To recover a customer's accounts (GET)
 /customers/{customerId}/accounts
+```
+```
 // To recover a customer's account (GET)
 /customers/{customerId}/accounts/{accountId}
+```
+```
 // To recover a customer's account's transactions (GET)
 /customers/{customerId}/accounts/{accountId}/transactions
+```
+```
 // To recover a customer's account's transaction (GET)
 /customers/{customerId}/accounts/{accountId}/transactions/{transactionId}
+```
+```
 // To create a new account with an initial credit (POST)
 /customers/{customerId}/accounts/{initialCredit}
+```
+```
 // To recover a single customer's details (name + surname + balance + transactions) (GET)
 /customers/{customerId}/details
 ```
