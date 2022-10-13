@@ -62,20 +62,6 @@ public class Account {
 		
 		return transactions;
 	}
-
-	public void addCreatedTransaction(Transaction transaction) {
-		createdTransactions.add(transaction);
-	}
-	
-	public void addReceivedTransaction(Transaction transaction) {
-		receivedTransactions.add(transaction);
-		balance = balance + transaction.getAmount();
-	}
-	
-	public void addSendTransaction(Transaction transaction) {
-		sendTransactions.add(transaction);
-		balance = balance - transaction.getAmount();
-	}
 	
 	public Long getCustomerId() {
 		return customer.getId();

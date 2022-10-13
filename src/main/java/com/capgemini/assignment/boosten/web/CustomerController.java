@@ -3,6 +3,8 @@ package com.capgemini.assignment.boosten.web;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import com.capgemini.assignment.boosten.exception.CustomerNotFoundException;
 import com.capgemini.assignment.boosten.exception.TransactionNotFoundException;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
+import com.capgemini.assignment.boosten.model.CustomerDetails;
 import com.capgemini.assignment.boosten.model.Transaction;
 
 @RestController
@@ -71,11 +74,35 @@ public class CustomerController {
 
 	@GetMapping("/customers/{customerId}")
 	EntityModel<Customer> one(@PathVariable Long customerId) {
-
 		Customer customer = customerDao.findById(customerId) //
 				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
 		return customerAssembler.toModel(customer);
+	}
+
+	@GetMapping("/customers/{customerId}/details")
+	CustomerDetails oneDetails(@PathVariable Long customerId) {
+		Customer customer = customerDao.findById(customerId) //
+				.orElseThrow(() -> new CustomerNotFoundException(customerId));
+
+		Collection<Transaction> transactions = new ArrayList<>();
+
+		Collection<Long> accountsId = customer.getAccounts();
+
+		for (Long accountId : accountsId) {
+			Account account = accountDao.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
+
+			Collection<Transaction> accountTransactions = account.getTransactions();
+
+			for (Transaction transaction : accountTransactions) {
+				transactions.add(transaction);
+			}
+		}
+
+		CustomerDetails details = new CustomerDetails(customer.getName(), customer.getSurname(), customer.getBalance(),
+				transactions);
+
+		return details;
 	}
 
 	@PutMapping("/customers/{customerId}")
@@ -108,12 +135,12 @@ public class CustomerController {
 				}) //
 				.collect(Collectors.toList());
 
-		return CollectionModel.of(accounts, linkTo(methodOn(CustomerController.class).customerAccounts(customerId)).withSelfRel());
+		return CollectionModel.of(accounts,
+				linkTo(methodOn(CustomerController.class).customerAccounts(customerId)).withSelfRel());
 	}
 
 	@GetMapping("/customers/{customerId}/accounts/{accountId}")
-	EntityModel<Account> customerAccount(@PathVariable Long customerId,
-			@PathVariable Long accountId) {
+	EntityModel<Account> customerAccount(@PathVariable Long customerId, @PathVariable Long accountId) {
 		Account account = accountDao.findById(accountId) //
 				.orElseThrow(() -> new AccountNotFoundException(accountId));
 
@@ -132,12 +159,14 @@ public class CustomerController {
 				}) //
 				.collect(Collectors.toList());
 
-		return CollectionModel.of(transactions, linkTo(methodOn(CustomerController.class).customerAccountTransactions(customerId, accountId)).withSelfRel());
+		return CollectionModel.of(transactions,
+				linkTo(methodOn(CustomerController.class).customerAccountTransactions(customerId, accountId))
+						.withSelfRel());
 	}
 
 	@GetMapping("/customers/{customerId}/accounts/{accountId}/transactions/{transactionId}")
-	EntityModel<Transaction> customerAccountTransaction(@PathVariable Long customerId,
-			@PathVariable Long accountId, @PathVariable Long transactionId) {
+	EntityModel<Transaction> customerAccountTransaction(@PathVariable Long customerId, @PathVariable Long accountId,
+			@PathVariable Long transactionId) {
 		Transaction transaction = transactionDao.findById(transactionId) //
 				.orElseThrow(() -> new TransactionNotFoundException(transactionId));
 
@@ -157,10 +186,6 @@ public class CustomerController {
 			Transaction transaction = new Transaction(initialCredit, "Cash in on creation", //
 					newAccount, newAccount, newAccount);
 			transaction = transactionDao.save(transaction);
-
-			newAccount.addCreatedTransaction(transaction);
-			newAccount.addReceivedTransaction(transaction);
-			newAccount.addSendTransaction(transaction);
 
 			newAccount.setBalance(initialCredit);
 
