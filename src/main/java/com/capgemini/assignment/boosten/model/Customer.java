@@ -34,47 +34,49 @@ public class Customer {
 	@Getter
 	@Setter
 	private CustomerStatus status;
-	
+
 	/**
-	 * As it should be, we keep the list of accounts for a customer, although in the database this column does not exist
+	 * As it should be, we keep the list of accounts for a customer, although in the
+	 * database this column does not exist
 	 */
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Account> accounts = new ArrayList<>();
-	
+
 	public Collection<Long> getAccountsId() {
 		Collection<Long> accountsId = new ArrayList<>();
-		
+
 		for (Account account : accounts) {
 			accountsId.add(account.getId());
 		}
-		
+
 		return accountsId;
 	}
-	
+
 	@JsonIgnore
 	public Collection<Account> getAccounts() {
 		Collection<Account> accounts = new ArrayList<>();
-		
+
 		for (Account account : this.accounts) {
 			accounts.add(account);
 		}
-		
+
 		return accounts;
 	}
-	
+
 	/**
-	 * Used to recover the current total balance of a customer, which is the aggregate of its accounts balance
+	 * Used to recover the current total balance of a customer, which is the
+	 * aggregate of its accounts balance
 	 */
 	public double getBalance() {
 		double balance = 0.0;
-		
+
 		for (Account account : accounts) {
 			balance = balance + account.getBalance();
 		}
-		
+
 		return balance;
 	}
-	
+
 	public void addAccount(Account account) {
 		accounts.add(account);
 	}

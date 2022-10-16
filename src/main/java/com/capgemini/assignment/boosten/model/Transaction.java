@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * The entity for transaction, which has no setter as the value for a transaction should obviously not change after its creation
+ * The entity for transaction, which has no setter as the value for a
+ * transaction should obviously not change after its creation
  */
 @Entity
 @ToString
@@ -30,11 +31,11 @@ public class Transaction {
 	private String communication;
 	@Getter
 	private Timestamp date;
-	
+
 	/**
 	 * We fetch the following relations eagerly as there is no list in there
 	 */
-	
+
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "FKCreator")
 	private Account creator;
@@ -47,8 +48,7 @@ public class Transaction {
 	@JoinColumn(name = "FKReceiver")
 	private Account receiver;
 
-	public Transaction(double amount, String communication,
-			Account creator, Account sender, Account receiver) {
+	public Transaction(double amount, String communication, Account creator, Account sender, Account receiver) {
 		this.amount = amount;
 		this.communication = communication;
 		this.creator = creator;
@@ -56,27 +56,27 @@ public class Transaction {
 		this.receiver = receiver;
 		this.date = new Timestamp(System.currentTimeMillis());
 	}
-	
+
 	public Long getCreatorId() {
 		return creator.getId();
 	}
-	
+
 	public Long getSenderId() {
 		return sender.getId();
 	}
-	
+
 	public Long getReceiverId() {
 		return receiver.getId();
 	}
-	
+
 	public Long getCreatorCustomerId() {
 		return creator.getCustomerId();
 	}
-	
+
 	public Long getReceiverCustomerId() {
 		return receiver.getCustomerId();
 	}
-	
+
 	public Long getSenderCustomerId() {
 		return sender.getCustomerId();
 	}

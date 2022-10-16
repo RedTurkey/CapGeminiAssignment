@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -21,13 +19,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.capgemini.assignment.boosten.config.LoadDatabase;
 import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
 import com.capgemini.assignment.boosten.data.ITransactionDAO;
-import com.capgemini.assignment.boosten.exception.AccountNotFoundException;
 import com.capgemini.assignment.boosten.exception.CustomerNotFoundException;
-import com.capgemini.assignment.boosten.exception.TransactionNotFoundException;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
 import com.capgemini.assignment.boosten.model.CustomerDetails;
@@ -48,8 +43,6 @@ public class CustomerController {
 	private final CustomerModelAssembler customerAssembler;
 	private final TransactionModelAssembler transactionAssembler;
 	private final AccountModelAssembler accountAssembler;
-
-	private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
 
 	CustomerController(ICustomerDAO customerDao, CustomerModelAssembler customerAssembler,
 			ITransactionDAO transactionDao, TransactionModelAssembler transactionAssembler, IAccountDAO accountDao,
