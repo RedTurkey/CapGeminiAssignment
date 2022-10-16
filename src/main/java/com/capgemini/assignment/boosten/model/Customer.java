@@ -77,10 +77,6 @@ public class Customer {
 		return balance;
 	}
 
-	public void addAccount(Account account) {
-		accounts.add(account);
-	}
-
 	public Customer(String name, String surname) {
 		this.name = name;
 		this.surname = surname;
