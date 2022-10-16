@@ -12,11 +12,13 @@ import com.capgemini.assignment.boosten.model.Account;
 @Component
 public class AccountModelAssembler implements RepresentationModelAssembler<Account, EntityModel<Account>> {
 
-  @Override
-  public EntityModel<Account> toModel(Account account) {
-    return EntityModel.of(account, //
-        linkTo(methodOn(CustomerController.class).customerAccount(account.getCustomerId(), account.getId())).withSelfRel(),
-        linkTo(methodOn(CustomerController.class).customerAccountTransactions(account.getCustomerId(), account.getId())).withRel("customerAccountTransaction"),
-        linkTo(methodOn(CustomerController.class).customerAccounts(account.getCustomerId())).withRel("customerAccounts"));
-  }
+	@Override
+	public EntityModel<Account> toModel(Account account) {
+		return EntityModel.of(account, //
+				linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel(),
+				linkTo(methodOn(AccountController.class).accountTransactions(account.getId()))
+						.withRel("account's transactions"),
+				linkTo(methodOn(CustomerController.class).one(account.getCustomerId())).withRel("account's customer"),
+				linkTo(methodOn(AccountController.class).all()).withRel("all"));
+	}
 }

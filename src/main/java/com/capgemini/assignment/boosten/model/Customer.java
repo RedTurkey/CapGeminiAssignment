@@ -10,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +41,7 @@ public class Customer {
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Collection<Account> accounts = new ArrayList<>();
 	
-	public Collection<Long> getAccounts() {
+	public Collection<Long> getAccountsId() {
 		Collection<Long> accountsId = new ArrayList<>();
 		
 		for (Account account : accounts) {
@@ -47,6 +49,17 @@ public class Customer {
 		}
 		
 		return accountsId;
+	}
+	
+	@JsonIgnore
+	public Collection<Account> getAccounts() {
+		Collection<Account> accounts = new ArrayList<>();
+		
+		for (Account account : this.accounts) {
+			accounts.add(account);
+		}
+		
+		return accounts;
 	}
 	
 	/**

@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.capgemini.assignment.boosten.config.LoadDatabase;
 import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
 import com.capgemini.assignment.boosten.data.ITransactionDAO;
@@ -31,9 +34,10 @@ import com.capgemini.assignment.boosten.model.CustomerDetails;
 import com.capgemini.assignment.boosten.model.Transaction;
 
 /**
- * The main and only controller since most data relate around the customer, albeit there was supposed to be an account
- * controller and a transaction controller, purely to have their individual data easily accessible without having to send
- * the customer id every time
+ * The main and only controller since most data relate around the customer,
+ * albeit there was supposed to be an account controller and a transaction
+ * controller, purely to have their individual data easily accessible without
+ * having to send the customer id every time
  */
 @RestController
 public class CustomerController {
@@ -44,6 +48,8 @@ public class CustomerController {
 	private final CustomerModelAssembler customerAssembler;
 	private final TransactionModelAssembler transactionAssembler;
 	private final AccountModelAssembler accountAssembler;
+
+	private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
 
 	CustomerController(ICustomerDAO customerDao, CustomerModelAssembler customerAssembler,
 			ITransactionDAO transactionDao, TransactionModelAssembler transactionAssembler, IAccountDAO accountDao,
@@ -86,17 +92,15 @@ public class CustomerController {
 	}
 
 	@GetMapping("/customers/{customerId}/details")
-	CustomerDetails oneDetails(@PathVariable Long customerId) {
-		Customer customer = customerDao.findById(customerId) //
+	CustomerDetails customerDetails(@PathVariable Long customerId) {
+		Customer customer = customerDao.findByIdWithAccounts(customerId) //
 				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
 		Collection<Transaction> transactions = new ArrayList<>();
 
-		Collection<Long> accountsId = customer.getAccounts();
+		Collection<Account> accounts = customer.getAccounts();
 
-		for (Long accountId : accountsId) {
-			Account account = accountDao.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
-
+		for (Account account : accounts) {
 			Collection<Transaction> accountTransactions = account.getTransactions();
 
 			for (Transaction transaction : accountTransactions) {
@@ -133,49 +137,36 @@ public class CustomerController {
 				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
 		List<EntityModel<Account>> accounts = customer.getAccounts().stream() //
-				.map(accountId -> {
-					Account account = accountDao.findById(accountId)
-							.orElseThrow(() -> new AccountNotFoundException(accountId));
-					return accountAssembler.toModel(account);
-				}) //
+				.map(accountAssembler::toModel) //
 				.collect(Collectors.toList());
 
 		return CollectionModel.of(accounts,
 				linkTo(methodOn(CustomerController.class).customerAccounts(customerId)).withSelfRel());
 	}
 
-	@GetMapping("/customers/{customerId}/accounts/{accountId}")
-	EntityModel<Account> customerAccount(@PathVariable Long customerId, @PathVariable Long accountId) {
-		Account account = accountDao.findById(accountId) //
-				.orElseThrow(() -> new AccountNotFoundException(accountId));
+	@GetMapping("/customers/{customerId}/transactions")
+	CollectionModel<EntityModel<Transaction>> customerTransactions(@PathVariable Long customerId) {
+		Customer customer = customerDao.findByIdWithAccounts(customerId) //
+				.orElseThrow(() -> new CustomerNotFoundException(customerId));
 
-		return accountAssembler.toModel(account);
-	}
+		Collection<Transaction> transactions = new ArrayList<>();
 
-	@GetMapping("/customers/{customerId}/accounts/{accountId}/transactions")
-	CollectionModel<EntityModel<Transaction>> customerAccountTransactions(@PathVariable Long customerId,
-			@PathVariable Long accountId) {
-		Account account = accountDao.findById(accountId) //
-				.orElseThrow(() -> new AccountNotFoundException(accountId));
+		Collection<Account> accounts = customer.getAccounts();
 
-		List<EntityModel<Transaction>> transactions = account.getTransactions().stream() //
-				.map(transaction -> {
-					return transactionAssembler.toModel(transaction);
-				}) //
+		for (Account account : accounts) {
+			Collection<Transaction> accountTransactions = account.getTransactions();
+
+			for (Transaction transaction : accountTransactions) {
+				transactions.add(transaction);
+			}
+		}
+
+		List<EntityModel<Transaction>> transactionModels = transactions.stream() //
+				.map(transactionAssembler::toModel) //
 				.collect(Collectors.toList());
 
-		return CollectionModel.of(transactions,
-				linkTo(methodOn(CustomerController.class).customerAccountTransactions(customerId, accountId))
-						.withSelfRel());
-	}
-
-	@GetMapping("/customers/{customerId}/accounts/{accountId}/transactions/{transactionId}")
-	EntityModel<Transaction> customerAccountTransaction(@PathVariable Long customerId, @PathVariable Long accountId,
-			@PathVariable Long transactionId) {
-		Transaction transaction = transactionDao.findById(transactionId) //
-				.orElseThrow(() -> new TransactionNotFoundException(transactionId));
-
-		return transactionAssembler.toModel(transaction);
+		return CollectionModel.of(transactionModels,
+				linkTo(methodOn(CustomerController.class).customerTransactions(customerId)).withSelfRel());
 	}
 
 	@PostMapping("/customers/{customerId}/accounts/{initialCredit}")

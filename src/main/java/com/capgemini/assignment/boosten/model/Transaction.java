@@ -68,4 +68,16 @@ public class Transaction {
 	public Long getReceiverId() {
 		return receiver.getId();
 	}
+	
+	public Long getCreatorCustomerId() {
+		return creator.getCustomerId();
+	}
+	
+	public Long getReceiverCustomerId() {
+		return receiver.getCustomerId();
+	}
+	
+	public Long getSenderCustomerId() {
+		return sender.getCustomerId();
+	}
 }

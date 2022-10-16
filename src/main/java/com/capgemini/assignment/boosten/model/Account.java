@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,6 +55,7 @@ public class Account {
 		this.status = AccountStatus.OPEN;
 	}
 	
+	@JsonIgnore
 	public Collection<Transaction> getTransactions() {
 		Collection<Transaction> transactions = new ArrayList<>();
 
@@ -65,6 +68,20 @@ public class Account {
 		}
 		
 		return transactions;
+	}
+	
+	public Collection<Long> getTransactionsId() {
+		Collection<Long> transactionsId = new ArrayList<>();
+
+		for(Transaction transaction : sendTransactions) {
+			transactionsId.add(transaction.getId());
+		}
+
+		for(Transaction transaction : receivedTransactions) {
+			transactionsId.add(transaction.getId());
+		}
+		
+		return transactionsId;
 	}
 	
 	public Long getCustomerId() {

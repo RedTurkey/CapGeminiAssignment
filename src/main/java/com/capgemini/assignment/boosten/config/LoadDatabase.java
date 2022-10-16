@@ -25,11 +25,13 @@ public class LoadDatabase {
 	CommandLineRunner initDatabase(ICustomerDAO customerDAO, IAccountDAO accountDAO, ITransactionDAO transactionDao) {
 
 		return args -> {
+			Customer c5 = new Customer("System", "Bank");
 			Customer c1 = new Customer("Boosten", "Vincent");
 			Customer c2 = new Customer("Boosten", "Jonathan");
 			Customer c3 = new Customer("Boosten", "Jeremy");
 			Customer c4 = new Customer("Taburiaux", "Alyson");
 
+			c5 = customerDAO.save(c5);
 			c1 = customerDAO.save(c1);
 			c2 = customerDAO.save(c2);
 			c3 = customerDAO.save(c3);
@@ -41,6 +43,10 @@ public class LoadDatabase {
 			Account a4 = new Account(c2);
 			Account a5 = new Account(c2);
 			Account a6 = new Account(c3);
+			Account a7 = new Account(c5);
+			
+			a7.setBalance(1000000);
+			a7 = accountDAO.save(a7);
 
 			a1 = accountDAO.save(a1);
 			a2 = accountDAO.save(a2);
