@@ -24,9 +24,9 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 public class TransactionController {
-	private final TransactionServices transactionServices;
+	private TransactionServices transactionServices;
 
-	private final TransactionModelAssembler transactionAssembler;
+	private TransactionModelAssembler transactionAssembler;
 
 	@GetMapping("/transactions")
 	CollectionModel<EntityModel<Transaction>> all() {

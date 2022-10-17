@@ -2,6 +2,8 @@ package com.capgemini.assignment.boosten.services;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.capgemini.assignment.boosten.data.ITransactionDAO;
@@ -10,14 +12,18 @@ import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Transaction;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Service
 @RequiredArgsConstructor
 public class TransactionServices {
 	private final ITransactionDAO transactionDao;
-	@Setter
 	private AccountServices accountServices;
+
+	@Lazy
+	@Autowired
+	public void setAccountServices(AccountServices accountServices) {
+		this.accountServices = accountServices;
+	}
 
 	public List<Transaction> getAllTransactions() {
 		return transactionDao.findAll();

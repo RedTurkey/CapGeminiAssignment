@@ -29,10 +29,10 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 public class AccountController {
-	private final AccountServices accountServices;
+	private AccountServices accountServices;
 
-	private final AccountModelAssembler accountAssembler;
-	private final TransactionModelAssembler transactionAssembler;
+	private AccountModelAssembler accountAssembler;
+	private TransactionModelAssembler transactionAssembler;
 
 	@GetMapping("/accounts")
 	CollectionModel<EntityModel<Account>> all() {

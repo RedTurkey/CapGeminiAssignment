@@ -4,12 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
 import com.capgemini.assignment.boosten.dto.CustomerDetailsDTO;
 import com.capgemini.assignment.boosten.exception.CustomerDeactivatedException;
 import com.capgemini.assignment.boosten.exception.CustomerNotFoundException;
+import com.capgemini.assignment.boosten.exception.InvalidReceiverAccountException;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.AccountStatus;
 import com.capgemini.assignment.boosten.model.Customer;
@@ -17,14 +20,18 @@ import com.capgemini.assignment.boosten.model.CustomerStatus;
 import com.capgemini.assignment.boosten.model.Transaction;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerServices {
 	private final ICustomerDAO customerDao;
-	@Setter
 	private AccountServices accountServices;
+
+	@Lazy
+	@Autowired
+	public void setAccountServices(AccountServices accountServices) {
+		this.accountServices = accountServices;
+	}
 
 	public List<Customer> getAllCustomers() {
 		return customerDao.findAll();
@@ -56,6 +63,9 @@ public class CustomerServices {
 		checkCustomerStatus(customer);
 
 		Account receiverAccount = accountServices.getOneAccount(receiverId);
+
+		if (receiverAccount.getCustomerId() == customer.getId())
+			throw new InvalidReceiverAccountException(receiverId);
 
 		accountServices.checkAccountStatus(receiverAccount);
 
