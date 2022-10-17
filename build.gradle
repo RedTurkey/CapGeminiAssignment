@@ -7,7 +7,8 @@ plugins {
 
 group = 'com.capgemini.assignment.boosten'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility  = JavaVersion.VERSION_17
 
 configurations {
 	compileOnly {
@@ -32,6 +33,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.vintage:junit-vintage-engine:5.9.1'
 	testImplementation 'org.mockito:mockito-core:2.1.0'
 }
 
