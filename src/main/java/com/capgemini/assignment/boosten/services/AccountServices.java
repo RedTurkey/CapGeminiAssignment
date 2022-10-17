@@ -13,14 +13,17 @@ import com.capgemini.assignment.boosten.model.AccountStatus;
 import com.capgemini.assignment.boosten.model.Customer;
 import com.capgemini.assignment.boosten.model.Transaction;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AccountServices {
 	private final IAccountDAO accountDao;
-	private final TransactionServices transactionServices;
-	private final CustomerServices customerServices;
+	@Setter
+	private TransactionServices transactionServices;
+	@Setter
+	private CustomerServices customerServices;
 
 	public List<Account> getAllAccounts() {
 		return accountDao.findAll();
@@ -30,14 +33,23 @@ public class AccountServices {
 		return accountDao.findById(accountId).orElseThrow(() -> new AccountNotFoundException(accountId));
 	}
 
+	public void checkAccountStatus(Account account) {
+		if (account.getStatus() == AccountStatus.CLOSED)
+			throw new AccountClosedException(account.getId());
+	}
+
 	public Account createAccount(Long customerId, double initialCredit) {
 		Customer customer = customerServices.getOneCustomer(customerId);
+
+		customerServices.checkCustomerStatus(customer);
+
 		Account newAccount = new Account(customer);
 
 		newAccount = accountDao.save(newAccount);
 
 		if (initialCredit != 0) {
-			transactionServices.createTransaction(initialCredit, "Transfer on closure", newAccount.getId(), newAccount.getId(), newAccount.getId());
+			transactionServices.createTransaction(initialCredit, "Transfer on closure", newAccount.getId(),
+					newAccount.getId(), newAccount.getId());
 
 			newAccount.setBalance(newAccount.getBalance() + initialCredit);
 
@@ -46,8 +58,9 @@ public class AccountServices {
 
 		return newAccount;
 	}
-	
+
 	public Account updateAccountBalance(Account account, double balance) {
+		checkAccountStatus(account);
 		account.setBalance(balance);
 		return accountDao.save(account);
 	}
@@ -58,37 +71,38 @@ public class AccountServices {
 		return account.getTransactions();
 	}
 
-	public void closeAccount(Long accountId, Long receiverId) {
+	public Account closeAccount(Long accountId, Long receiverId) {
 		Account account = getOneAccount(accountId);
-		
-		if (account.getStatus() == AccountStatus.CLOSED) throw new AccountClosedException(accountId);
+
+		checkAccountStatus(account);
 
 		Account receiverAccount = getOneAccount(receiverId);
 
-		if (receiverAccount.getStatus() == AccountStatus.CLOSED) throw new AccountClosedException(receiverId);
-		
-		Transaction transaction = transactionServices.createTransaction(account.getBalance(), "Transfer on closure", account.getId(), account.getId(), receiverAccount.getId());
+		checkAccountStatus(receiverAccount);
+
+		Transaction transaction = transactionServices.createTransaction(account.getBalance(), "Transfer on closure",
+				account.getId(), account.getId(), receiverAccount.getId());
 
 		account.setBalance(0);
-		receiverAccount.setBalance(receiverAccount.getBalance() + transaction.getAmount());
-
 		account.setStatus(AccountStatus.CLOSED);
 
-		account = accountDao.save(account);
-		receiverAccount = accountDao.save(receiverAccount);
+		updateAccountBalance(receiverAccount, receiverAccount.getBalance() + transaction.getAmount());
+
+		return accountDao.save(account);
 	}
 
-	public void closeAccount(Account account, Account receiver) {
-		if (account.getStatus() == AccountStatus.CLOSED) throw new AccountClosedException(account.getId());
-		if (receiver.getStatus() == AccountStatus.CLOSED) throw new AccountClosedException(receiver.getId());
-		
-		Transaction transaction = transactionServices.createTransaction(account.getBalance(), "Transfer on closure", account, account, receiver);
+	public Account closeAccount(Account account, Account receiver) {
+		checkAccountStatus(account);
+		checkAccountStatus(receiver);
 
-		updateAccountBalance(account, 0);
+		Transaction transaction = transactionServices.createTransaction(account.getBalance(), "Transfer on closure",
+				account, account, receiver);
+
+		account.setBalance(0);
+		account.setStatus(AccountStatus.CLOSED);
+
 		updateAccountBalance(receiver, receiver.getBalance() + transaction.getAmount());
 
-		account.setStatus(AccountStatus.CLOSED);
-		
-		accountDao.save(account);
+		return accountDao.save(account);
 	}
 }

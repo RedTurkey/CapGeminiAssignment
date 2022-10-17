@@ -13,7 +13,7 @@ public class CustomerDeactivatedAdvice {
 
 	@ResponseBody
 	@ExceptionHandler(CustomerDeactivatedException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	public String CustomerDeactivatedHandler(CustomerDeactivatedException ex) {
 		return ex.getMessage();
 	}

@@ -9,13 +9,15 @@ import com.capgemini.assignment.boosten.exception.TransactionNotFoundException;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Transaction;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TransactionServices {
 	private final ITransactionDAO transactionDao;
-	private final AccountServices accountServices;
+	@Setter
+	private AccountServices accountServices;
 
 	public List<Transaction> getAllTransactions() {
 		return transactionDao.findAll();
@@ -30,9 +32,15 @@ public class TransactionServices {
 			Long receiverId) {
 		Account creatorAccount = accountServices.getOneAccount(creatorId);
 
+		accountServices.checkAccountStatus(creatorAccount);
+
 		Account senderAccount = accountServices.getOneAccount(senderId);
 
+		accountServices.checkAccountStatus(senderAccount);
+
 		Account receiverAccount = accountServices.getOneAccount(receiverId);
+
+		accountServices.checkAccountStatus(receiverAccount);
 
 		Transaction newTransaction = new Transaction(amount, communication, creatorAccount, senderAccount,
 				receiverAccount);
@@ -48,6 +56,10 @@ public class TransactionServices {
 
 	public Transaction createTransaction(double amount, String communication, Account creator, Account sender,
 			Account receiver) {
+		accountServices.checkAccountStatus(creator);
+		accountServices.checkAccountStatus(sender);
+		accountServices.checkAccountStatus(receiver);
+
 		Transaction newTransaction = new Transaction(amount, communication, creator, sender, receiver);
 
 		newTransaction = transactionDao.save(newTransaction);

@@ -1,5 +1,6 @@
 package com.capgemini.assignment.boosten.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.capgemini.assignment.boosten.dto.CustomerDeleteDTO;
 import com.capgemini.assignment.boosten.dto.CustomerDetailsDTO;
 import com.capgemini.assignment.boosten.dto.CustomerPostDTO;
 import com.capgemini.assignment.boosten.dto.CustomerPutDTO;
@@ -27,12 +29,6 @@ import com.capgemini.assignment.boosten.services.CustomerServices;
 
 import lombok.AllArgsConstructor;
 
-/**
- * The main and only controller since most data relate around the customer,
- * albeit there was supposed to be an account controller and a transaction
- * controller, purely to have their individual data easily accessible without
- * having to send the customer id every time
- */
 @RestController
 @AllArgsConstructor
 public class CustomerController {
@@ -44,16 +40,17 @@ public class CustomerController {
 
 	@GetMapping("/customers")
 	CollectionModel<EntityModel<Customer>> all() {
-
 		List<EntityModel<Customer>> customers = customerServices.getAllCustomers().stream()
 				.map(customerAssembler::toModel).collect(Collectors.toList());
 
-		return CollectionModel.of(customers, linkTo(methodOn(CustomerController.class).all()).withSelfRel());
+		return CollectionModel.of(customers, linkTo(methodOn(CustomerController.class).all()).withSelfRel()
+				.andAffordance(afford(methodOn(CustomerController.class).newCustomer(null))));
 	}
 
 	@PostMapping("/customers")
 	ResponseEntity<?> newCustomer(@RequestBody CustomerPostDTO dto) {
-		EntityModel<Customer> entityModel = customerAssembler.toModel(customerServices.createCustomer(dto.getName(), dto.getSurname()));
+		EntityModel<Customer> entityModel = customerAssembler
+				.toModel(customerServices.createCustomer(dto.getName(), dto.getSurname()));
 
 		return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
 	}
@@ -69,19 +66,17 @@ public class CustomerController {
 	}
 
 	@PutMapping("/customers/{customerId}")
-	ResponseEntity<?> replaceCustomer(@RequestBody CustomerPutDTO dto, @PathVariable Long customerId) {
-		EntityModel<Customer> entityModel = customerAssembler.toModel(customerServices.updateCustomer(customerId, dto.getName(), dto.getSurname()));
+	ResponseEntity<?> updateCustomer(@PathVariable Long customerId, @RequestBody CustomerPutDTO dto) {
+		EntityModel<Customer> entityModel = customerAssembler
+				.toModel(customerServices.updateCustomer(customerId, dto.getName(), dto.getSurname()));
 
-		return ResponseEntity //
-				.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
-				.body(entityModel);
+		return ResponseEntity.ok(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri());
 	}
 
 	@GetMapping("/customers/{customerId}/accounts")
 	CollectionModel<EntityModel<Account>> customerAccounts(@PathVariable Long customerId) {
-		List<EntityModel<Account>> accounts = customerServices.getCustomerAccounts(customerId).stream() //
-				.map(accountAssembler::toModel) //
-				.collect(Collectors.toList());
+		List<EntityModel<Account>> accounts = customerServices.getCustomerAccounts(customerId).stream()
+				.map(accountAssembler::toModel).collect(Collectors.toList());
 
 		return CollectionModel.of(accounts,
 				linkTo(methodOn(CustomerController.class).customerAccounts(customerId)).withSelfRel());
@@ -89,11 +84,18 @@ public class CustomerController {
 
 	@GetMapping("/customers/{customerId}/transactions")
 	CollectionModel<EntityModel<Transaction>> customerTransactions(@PathVariable Long customerId) {
-		List<EntityModel<Transaction>> transactionModels = customerServices.getCustomerTransactions(customerId).stream() //
-				.map(transactionAssembler::toModel) //
-				.collect(Collectors.toList());
+		List<EntityModel<Transaction>> transactionModels = customerServices.getCustomerTransactions(customerId).stream()
+				.map(transactionAssembler::toModel).collect(Collectors.toList());
 
 		return CollectionModel.of(transactionModels,
 				linkTo(methodOn(CustomerController.class).customerTransactions(customerId)).withSelfRel());
+	}
+
+	@PutMapping("/customers/{customerId}/deactivate")
+	ResponseEntity<?> deactivateCustomer(@PathVariable Long customerId, @RequestBody CustomerDeleteDTO dto) {
+		EntityModel<Customer> entityModel = customerAssembler
+				.toModel(customerServices.deactivateCustomer(customerId, dto.getReceiverId()));
+
+		return ResponseEntity.ok(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri());
 	}
 }

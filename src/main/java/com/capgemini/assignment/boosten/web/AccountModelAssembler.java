@@ -8,17 +8,27 @@ import org.springframework.hateoas.server.RepresentationModelAssembler;
 import org.springframework.stereotype.Component;
 
 import com.capgemini.assignment.boosten.model.Account;
+import com.capgemini.assignment.boosten.model.AccountStatus;
 
 @Component
 public class AccountModelAssembler implements RepresentationModelAssembler<Account, EntityModel<Account>> {
 
 	@Override
 	public EntityModel<Account> toModel(Account account) {
-		return EntityModel.of(account, //
+		EntityModel<Account> entityModel = EntityModel.of(account,
 				linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel(),
 				linkTo(methodOn(AccountController.class).accountTransactions(account.getId()))
 						.withRel("account's transactions"),
 				linkTo(methodOn(CustomerController.class).one(account.getCustomerId())).withRel("account's customer"),
 				linkTo(methodOn(AccountController.class).all()).withRel("all"));
+
+		if (account.getStatus() == AccountStatus.OPEN) {
+			entityModel.add(linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel());
+			entityModel.add(linkTo(methodOn(AccountController.class).closeAccount(account.getId(), null)).withRel("close account"));
+		} else {
+			entityModel.add(linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel());
+		}
+
+		return entityModel;
 	}
 }

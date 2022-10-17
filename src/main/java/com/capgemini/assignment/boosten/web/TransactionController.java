@@ -1,5 +1,6 @@
 package com.capgemini.assignment.boosten.web;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.afford;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -33,7 +34,8 @@ public class TransactionController {
 				.map(transactionAssembler::toModel) //
 				.collect(Collectors.toList());
 
-		return CollectionModel.of(transactions, linkTo(methodOn(TransactionController.class).all()).withSelfRel());
+		return CollectionModel.of(transactions, linkTo(methodOn(TransactionController.class).all()).withSelfRel()
+				.andAffordance(afford(methodOn(TransactionController.class).newTransaction(null))));
 	}
 
 	@PostMapping("/transactions")

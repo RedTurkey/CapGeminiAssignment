@@ -13,7 +13,7 @@ public class AccountClosedAdvice {
 
 	@ResponseBody
 	@ExceptionHandler(AccountClosedException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
 	public String AccountClosedHandler(AccountClosedException ex) {
 		return ex.getMessage();
 	}
