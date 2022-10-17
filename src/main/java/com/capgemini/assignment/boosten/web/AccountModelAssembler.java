@@ -23,10 +23,7 @@ public class AccountModelAssembler implements RepresentationModelAssembler<Accou
 				linkTo(methodOn(AccountController.class).all()).withRel("all"));
 
 		if (account.getStatus() == AccountStatus.OPEN) {
-			entityModel.add(linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel());
 			entityModel.add(linkTo(methodOn(AccountController.class).closeAccount(account.getId(), null)).withRel("close account"));
-		} else {
-			entityModel.add(linkTo(methodOn(AccountController.class).one(account.getId())).withSelfRel());
 		}
 
 		return entityModel;
