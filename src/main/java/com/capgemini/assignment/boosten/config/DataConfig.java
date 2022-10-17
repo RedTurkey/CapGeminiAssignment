@@ -1,10 +1,16 @@
 package com.capgemini.assignment.boosten.config;
 
+import javax.sql.DataSource;
+
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.capgemini.assignment.boosten.data.IAccountDAO;
 import com.capgemini.assignment.boosten.data.ICustomerDAO;
@@ -14,14 +20,11 @@ import com.capgemini.assignment.boosten.model.Customer;
 import com.capgemini.assignment.boosten.model.Transaction;
 
 @Configuration
-public class LoadDatabase {
+public class DataConfig {
+	private static final Logger log = LoggerFactory.getLogger(DataConfig.class);
 
-	private static final Logger log = LoggerFactory.getLogger(LoadDatabase.class);
-
-	/**
-	 * Basic data loading bean to have a set of basic data for this project
-	 */
 	@Bean
+	@Profile("dev")
 	CommandLineRunner initDatabase(ICustomerDAO customerDAO, IAccountDAO accountDAO, ITransactionDAO transactionDao) {
 
 		return args -> {
@@ -100,4 +103,30 @@ public class LoadDatabase {
 			transactionDao.findAll().forEach(transaction -> log.info("Preloaded " + transaction));
 		};
 	}
+
+	@Bean
+	@Profile("test")
+	public DataSource dataSourceTest() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+	}
+
+	@Bean
+	@Profile("dev")
+	public DataSource dataSourceServeur() {
+		return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+	}
+
+	@Bean
+	@Profile("pro")
+	public DataSource dataSourceTCPServeur() {
+		BasicDataSource ds = new BasicDataSource();
+		ds.setDriverClassName("org.h2.Driver");
+		ds.setUrl("jdbc:h2:tcp://localhost//"); // To complete
+		ds.setUsername("sa");
+		ds.setPassword("");
+		ds.setInitialSize(5);
+		ds.setMaxTotal(10);
+		return ds;
+	}
+
 }
