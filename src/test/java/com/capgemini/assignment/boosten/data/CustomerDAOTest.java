@@ -20,14 +20,14 @@ import com.capgemini.assignment.boosten.model.Customer;
 @DataJpaTest
 @ContextConfiguration(classes = CapGeminiAssignmentBoostenApplication.class)
 public class CustomerDAOTest {
-    @Autowired
-    private ICustomerDAO customerDao;
+	@Autowired
+	private ICustomerDAO customerDao;
 
-    private Customer toUpdateCustomer;
-    private Customer toDeleteCustomer;
-    
-    @Before
-    public void setup() {
+	private Customer toUpdateCustomer;
+	private Customer toDeleteCustomer;
+
+	@Before
+	public void setup() {
 		Customer c5 = new Customer("System", "Bank");
 		Customer c1 = new Customer("Boosten", "Vincent");
 		Customer c2 = new Customer("Boosten", "Jonathan");
@@ -38,42 +38,42 @@ public class CustomerDAOTest {
 
 		this.toUpdateCustomer = c1;
 		this.toDeleteCustomer = c2;
-    }
-    
-    @Test
-    public void testCreation() {
+	}
+
+	@Test
+	public void testCreation() {
 		Customer c3 = new Customer("Boosten", "Jeremy");
-		
+
 		assertThat(c3.getId()).isNull();
 
 		c3 = customerDao.save(c3);
 
 		assertThat(c3.getId()).isNotNull();
-		
+
 		Customer c3c = customerDao.findById(c3.getId()).get();
-		
+
 		assertThat(c3c).isEqualTo(c3);
-    }
-    
-    @Test
-    public void testUpdate() {
-    	assertThat(toUpdateCustomer.getSurname()).isEqualTo("Vincent");
-    	
-    	toUpdateCustomer.setSurname("Michel");
-    	
-    	toUpdateCustomer = customerDao.save(toUpdateCustomer);
-    	
-    	assertThat(toUpdateCustomer.getSurname()).isEqualTo("Michel");
-    }
-    
-    @Test
-    public void testDeletion() {
-    	assertThat(toDeleteCustomer).isNotNull();
-    	
-    	customerDao.delete(toDeleteCustomer);
-    	
-    	assertThrows(NoSuchElementException.class, () -> {
-        	toDeleteCustomer = customerDao.findById(toDeleteCustomer.getId()).get();
-    	});
-    }
+	}
+
+	@Test
+	public void testUpdate() {
+		assertThat(toUpdateCustomer.getSurname()).isEqualTo("Vincent");
+
+		toUpdateCustomer.setSurname("Michel");
+
+		toUpdateCustomer = customerDao.save(toUpdateCustomer);
+
+		assertThat(toUpdateCustomer.getSurname()).isEqualTo("Michel");
+	}
+
+	@Test
+	public void testDeletion() {
+		assertThat(toDeleteCustomer).isNotNull();
+
+		customerDao.delete(toDeleteCustomer);
+
+		assertThrows(NoSuchElementException.class, () -> {
+			toDeleteCustomer = customerDao.findById(toDeleteCustomer.getId()).get();
+		});
+	}
 }

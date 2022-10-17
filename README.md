@@ -1,17 +1,34 @@
 # CapGeminiAssignment
 Assignment for CapGemini from Boosten Vincent
 
-# Build and deploy
-Once you have cloned the project, provided that you have gradle installed on your computer, go into the project folder in your terminal, and launch the gradle command to clean and build the project :  
+# Build
+Once you have cloned the project, open a terminal and go in the project folder and type this to build the project :  
 ```
-gradle clean build
+./gradlew clean build
 ```
-Once that is done, make sure you have tomcat version 10 installed on your computer.  
-Since we are using tomcat 10, you have to locate your tomcat installation (under windows, it's C:\Program Files\Apache Software Foundation\Tomcat 10.0) and create a folder webapps-javaee if it does not exist.  
-You can then put the generated war file in that folder and restart tomcat, which will then migrate the war file from Java EE into Jakarta EE.
+The code will be build and a war file will be generated in build/libs in the project folder (not the file finishing with -plain).  
   
-The application should now be deployed and accessible on (or another port if you put your tomcat on something else than 8080) localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT  
-Note that the application is a Rest Spring API, and as such, does not have a front-end interface, you have to use simple request to recover the data, here is a list in case you need it :  
+# Test
+To launch the tests for the project, simply enter this command :  
+```
+./gradlew test
+```
+The result are accessible through various mean if you want more details, you can see them by opening build/reports/tests/test/index.html if you want.  
+  
+# Deploy
+Make sure you have Tomcat version 10 installed on your computer.  
+Since we are using Tomcat 10, you have to locate your Tomcat installation (under windows, it's "C:\Program Files\Apache Software Foundation\Tomcat 10.0" by default) and create a folder webapps-javaee if it does not exist.  
+You can then put the generated war file in that folder and restart Tomcat, which will then migrate the war file from Java EE into Jakarta EE.  
+  
+The application should now be deployed and accessible on (or another port if you put your Tomcat on something else than 8080) localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT  
+
+# Use
+Note that the application is a Rest Spring API, and as such, does not have a front-end interface, you have to use simple request to recover the data, here is a list in case you need it (note that all those path are prefixed by localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT) :  
+```
+// Root path to see the others path (GET)
+/
+```
+  
 ```
 // To recover all customers (GET)
 /customers
@@ -25,26 +42,34 @@ Note that the application is a Rest Spring API, and as such, does not have a fro
 /customers/{customerId}/accounts
 ```
 ```
-// To recover a customer's account (GET)
-/customers/{customerId}/accounts/{accountId}
-```
-```
-// To recover a customer's account's transactions (GET)
-/customers/{customerId}/accounts/{accountId}/transactions
-```
-```
-// To recover a customer's account's transaction (GET)
-/customers/{customerId}/accounts/{accountId}/transactions/{transactionId}
-```
-```
-// To create a new account with an initial credit (POST)
-/customers/{customerId}/accounts/{initialCredit}
+// To recover a customer's transactions (GET)
+/customers/{customerId}/transactions
 ```
 ```
 // To recover a single customer's details (name + surname + balance + transactions) (GET)
 /customers/{customerId}/details
 ```
+  
+```
+// To recover all accounts (GET)
+/accounts
+```
+```
+// To recover a single account (GET)
+/accounts/{accountId}
+```
+```
+// To recover an account's transactions (GET)
+/accounts/{accountId}/transactions
+```
+```
+// To create a new account with an initial credit (POST)
+/accounts/{initialCredit}
+```
+  
 For example, on my computer, the command to create a new account for a customer with an initial credit of 10 is as follow :  
 ```
 curl -X POST localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT/customers/1/accounts/10 -H 'Content-type:application/json' -d '{}' | json_pp
 ```
+  
+Do note though that this API follow the HAL-FORMS standard, and as such, you can recover all those path by following the requests return information.
