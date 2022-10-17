@@ -20,9 +20,9 @@ import com.capgemini.assignment.boosten.dto.AccountDeleteDTO;
 import com.capgemini.assignment.boosten.dto.AccountPostDTO;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Transaction;
+import com.capgemini.assignment.boosten.services.AccountServices;
 
 import lombok.AllArgsConstructor;
-import services.AccountServices;
 
 @RestController
 @AllArgsConstructor

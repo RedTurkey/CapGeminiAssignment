@@ -23,9 +23,9 @@ import com.capgemini.assignment.boosten.dto.CustomerPutDTO;
 import com.capgemini.assignment.boosten.model.Account;
 import com.capgemini.assignment.boosten.model.Customer;
 import com.capgemini.assignment.boosten.model.Transaction;
+import com.capgemini.assignment.boosten.services.CustomerServices;
 
 import lombok.AllArgsConstructor;
-import services.CustomerServices;
 
 /**
  * The main and only controller since most data relate around the customer,

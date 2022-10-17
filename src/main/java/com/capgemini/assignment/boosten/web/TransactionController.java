@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.capgemini.assignment.boosten.dto.TransactionPostDTO;
 import com.capgemini.assignment.boosten.model.Transaction;
+import com.capgemini.assignment.boosten.services.TransactionServices;
 
 import lombok.AllArgsConstructor;
-import services.TransactionServices;
 
 @RestController
 @AllArgsConstructor

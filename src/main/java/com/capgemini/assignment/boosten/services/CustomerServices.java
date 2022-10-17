@@ -1,4 +1,4 @@
-package services;
+package com.capgemini.assignment.boosten.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
