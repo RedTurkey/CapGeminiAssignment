@@ -62,4 +62,13 @@ public class CustomerControllerTest {
 		mvc.perform(get("/customers").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
+	@Test
+	public void testGetOneCustomer() throws Exception {
+		Customer customer = new Customer("Boosten", "Vincent");
+
+		given(customerServices.getOneCustomer((long) 1)).willReturn(customer);
+
+		mvc.perform(get("/customers/1").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+	}
+
 }
