@@ -1,28 +1,29 @@
 # CapGeminiAssignment
-Assignment for CapGemini from Boosten Vincent
-
-# Build
+Assignment for CapGemini from Boosten Vincent  
+Compiled against Java EE 17.  
+  
+## Build
 Once you have cloned the project, open a terminal and go in the project folder and type this to build the project :  
 ```
 ./gradlew clean build
 ```
 The code will be build and a war file will be generated in build/libs in the project folder (not the file finishing with -plain).  
   
-# Test
+## Test
 To launch the tests for the project, simply enter this command :  
 ```
 ./gradlew test
 ```
 The result are accessible through various mean if you want more details, you can see them by opening build/reports/tests/test/index.html if you want.  
   
-# Deploy
+## Deploy
 Make sure you have Tomcat version 10 installed on your computer.  
 Since we are using Tomcat 10, you have to locate your Tomcat installation (under windows, it's "C:\Program Files\Apache Software Foundation\Tomcat 10.0" by default) and create a folder webapps-javaee if it does not exist.  
 You can then put the generated war file in that folder and restart Tomcat, which will then migrate the war file from Java EE into Jakarta EE.  
   
 The application should now be deployed and accessible on (or another port if you put your Tomcat on something else than 8080) localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT  
 
-# Use
+## Use
 Note that the application is a Rest Spring API, and as such, does not have a front-end interface, you have to use simple request to recover the data, here is a list in case you need it (note that all those path are prefixed by localhost:8080/CapGeminiAssignmentBoosten-0.0.1-SNAPSHOT) :  
 #### Root :  
 ```
